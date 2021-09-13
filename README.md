@@ -50,3 +50,19 @@ and then run
 ```
 python -m pytest
 ```
+
+## Benchmarks
+To run the benchmarks you need to install `wrk` following the [official documentation](https://github.com/wg/wrk/blob/master/INSTALL)
+or, if you are on MacOS, running
+```shell
+brew install wrk
+```
+
+In the `benchmarks` directory there is a `lua` script that can be used to generate
+random integers that can be used as IP addresses in `wrk` requests.
+
+Run the benchmark tests
+```shell
+wrk -t1 -c100 -d30s -s benchmarks/counter.lua http://127.0.0.1:5000/logs
+```
+This should generate 2000 or 3000 requests per second.
