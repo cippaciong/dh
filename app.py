@@ -1,27 +1,38 @@
 import json
+import logging
 
-from flask import Flask, request
+from pydantic import BaseModel
+from fastapi import FastAPI
+
 from visitors.visitors_counter import VisitorsCounter
 
-app = Flask(__name__)
 
+logging.basicConfig(level=logging.INFO)
+
+app = FastAPI()
 counter = VisitorsCounter()
 
 
-@app.route("/")
-def home():
+class LogEntry(BaseModel):
+    timestamp: str
+    ip: str
+    url: str
+
+    def __str__(self):
+        return json.dumps({"timestamp": self.timestamp, "ip": self.ip, "url": self.url})
+
+
+@app.get("/")
+async def home():
     return "<p>Use either GET /visitors or POST /logs</p>"
 
 
-@app.route("/visitors")
-def get_visitors():
-    return json.dumps({"visitors": counter.visitors})
+@app.get("/visitors")
+async def get_visitors():
+    return {"visitors": counter.visitors}
 
 
-@app.route("/logs", methods=['POST'])
-def post_logs():
-    if request.is_json:
-        log_entry = request.json
-        counter.evaluate(json.dumps(log_entry))
-        return json.dumps({"accepted": True})
-    return json.dumps({"error": "not a valid json or didn't use application/json"})
+@app.post("/logs")
+async def post_logs(log_entry: LogEntry):
+    counter.evaluate(str(log_entry))
+    return {"accepted": True}
