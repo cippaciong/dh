@@ -23,10 +23,9 @@ pip install -r requirements.txt
 
 ## Usage
 After you have installed the dependencies and activated the virtualenv, you can
-run the Flask app
+run the FastAPI app
 ```shell
-export FLASK_APP=app
-flask run
+uvicorn app:app --port 5000
 ```
 The app will be available on `http://127.0.0.1:5000/`
 
